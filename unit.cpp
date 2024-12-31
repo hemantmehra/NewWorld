@@ -11,3 +11,5 @@ UnitType Unit::type()
 bool Unit::is_alive() { return m_alive; }
 
 void Unit::consume() { m_alive = false; }
+
+bool Unit::is_settler() { return m_type == U_Settler; }

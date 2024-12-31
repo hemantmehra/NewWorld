@@ -10,6 +10,8 @@ public:
     UnitType type();
     bool is_alive();
     void consume();
+
+    bool is_settler();
     int m_x;
     int m_y;
 

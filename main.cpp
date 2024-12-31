@@ -4,9 +4,10 @@
 #include <raylib.h>
 #include "city.h"
 #include "unit.h"
+#include "game.h"
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
 enum UI_Type {
     UI_Map,
@@ -31,6 +32,13 @@ void draw_cities(std::vector<City*> *city_vec, Texture2D city_texture, int map_t
 {
     for (auto city : *city_vec) {
         DrawTexture(city_texture, city->m_y*map_title_size, city->m_x*map_title_size, WHITE);
+        DrawText(
+            TextFormat("%d", city->population()),
+            city->m_y*map_title_size + map_title_size/3,
+            city->m_x*map_title_size + map_title_size/3,
+            2 * map_title_size/3,
+            WHITE
+        );
     }
 }
 
@@ -80,9 +88,11 @@ int main()
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "CIV");
     SetTargetFPS(30);
     Texture2D grass_texture = LoadTexture("assets/Grass.png");
-    Texture2D water_texture= LoadTexture("assets/Water.png");
+    Texture2D water_texture = LoadTexture("assets/Water.png");
     Texture2D city_texture = LoadTexture("assets/City.png");
     Texture2D settler_texture = LoadTexture("assets/Settler.png");
+
+    Game game;
 
     std::vector<Unit*> unit_vec;
     std::vector<City*> city_vec;
@@ -100,7 +110,7 @@ int main()
 
     const int map_title_size = 32;
     const int rows = SCREEN_HEIGHT / map_title_size + 1;
-    const int cols = SCREEN_WIDTH / map_title_size;
+    const int cols = SCREEN_WIDTH / map_title_size - 10;
 
     int map[50][50];
     for (int i=0; i<rows; i++) {
@@ -139,6 +149,10 @@ int main()
             current_ui = UI_Map;
         }
 
+        if (IsKeyReleased(KEY_ENTER)) {
+            game.next_turn();
+        }
+
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             int mx = GetMouseY() / map_title_size;
             int my = GetMouseX() / map_title_size;
@@ -148,7 +162,6 @@ int main()
                 if (city->m_x == mx && city->m_y == my) {
                     current_ui = UI_City;
                     current_city = city;
-                    // std::cout << "Found city\n";
                     break;
                 }
             }
@@ -178,8 +191,8 @@ int main()
                 break;
             }
 
-            // if (visible)
-            //     DrawTexture(water_texture, 5*map_title_size, 5*map_title_size, WHITE);
+            DrawText(TextFormat("Turn: %d", game.turn()), cols*map_title_size, 0, 24, WHITE);
+
         EndDrawing();
     }
 

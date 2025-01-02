@@ -138,8 +138,9 @@ int main()
         }
         if (IsKeyReleased(KEY_B)) {
             if (current_unit && current_unit->is_settler()) {
-                city_vec.push_back(new City(current_unit->m_x, current_unit->m_y));
-                std::cout << "[city] " << current_unit->m_x << ", " << current_unit->m_y << std::endl;
+                std::string city_name = game.get_next_city_name();
+                city_vec.push_back(new City(city_name, current_unit->m_x, current_unit->m_y));
+                std::cout << "[city] " << city_name << " " << current_unit->m_x << ", " << current_unit->m_y << std::endl;
                 current_unit->consume();
                 current_unit = get_next_unit(&unit_vec, current_unit);
             }
@@ -186,7 +187,11 @@ int main()
                 break;
 
                 case UI_City: {
-                    DrawText("This is City UI", 0, 0, 24, WHITE);
+                    DrawText(TextFormat("%s", current_city->name().c_str()), 10, 0, 24, WHITE);
+                    int idx = 0;
+                    for (auto task: current_city->tasks) {
+                        DrawText(TextFormat("%s", CityTask_to_Str(task).c_str()), 10, 24 + 24 * (idx++), 24, BLUE);
+                    }
                 }
                 break;
             }

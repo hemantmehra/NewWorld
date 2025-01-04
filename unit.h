@@ -1,7 +1,8 @@
 #pragma once
 
 enum UnitType {
-    U_Settler
+    U_Settler,
+    U_Warrior
 };
 
 class Unit {

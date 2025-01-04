@@ -37,8 +37,7 @@ int main()
 
     std::vector<Unit*> unit_vec;
     std::vector<City*> city_vec;
-    City *current_city;
-    Unit *current_unit;
+
     UI_Type current_ui = UI_Map;
 
     Unit *settler_unit = new Unit(U_Settler, 10, 10);
@@ -47,7 +46,7 @@ int main()
     unit_vec.push_back(settler_unit);
     unit_vec.push_back(settler_unit1);
 
-    current_unit = unit_vec.at(0);
+    game.set_current_unit(unit_vec.at(0));
 
     int frame_counter = 0;
     const int frameDelay = 10;
@@ -55,24 +54,24 @@ int main()
 
     while(!WindowShouldClose()) {
         if (IsKeyReleased(KEY_RIGHT)) {
-            if (current_unit) current_unit->m_y++;
+            if (game.current_unit()) game.current_unit()->m_y++;
         }
         if (IsKeyReleased(KEY_LEFT)) {
-            if (current_unit) current_unit->m_y--;
+            if (game.current_unit()) game.current_unit()->m_y--;
         }
         if (IsKeyReleased(KEY_UP)) {
-            if (current_unit) current_unit->m_x--;
+            if (game.current_unit()) game.current_unit()->m_x--;
         }
         if (IsKeyReleased(KEY_DOWN)) {
-            if (current_unit) current_unit->m_x++;
+            if (game.current_unit()) game.current_unit()->m_x++;
         }
         if (IsKeyReleased(KEY_B)) {
-            if (current_unit && current_unit->is_settler()) {
+            if (game.current_unit() && game.current_unit()->is_settler()) {
                 std::string city_name = game.get_next_city_name();
-                city_vec.push_back(new City(city_name, current_unit->m_x, current_unit->m_y));
-                std::cout << "[city] " << city_name << " " << current_unit->m_x << ", " << current_unit->m_y << std::endl;
-                current_unit->consume();
-                current_unit = get_next_unit(&unit_vec, current_unit);
+                city_vec.push_back(new City(city_name, game.current_unit()->m_x, game.current_unit()->m_y));
+                std::cout << "[city] " << city_name << " " << game.current_unit()->m_x << ", " << game.current_unit()->m_y << std::endl;
+                game.current_unit()->consume();
+                game.set_current_unit(get_next_unit(&unit_vec, game.current_unit()));
             }
         }
 
@@ -81,7 +80,7 @@ int main()
         }
 
         if (IsKeyReleased(KEY_ENTER)) {
-            game.next_turn();
+            game.next_turn(&city_vec);
         }
 
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
@@ -92,7 +91,7 @@ int main()
             for (auto city : city_vec) {
                 if (city->m_x == mx && city->m_y == my) {
                     current_ui = UI_City;
-                    current_city = city;
+                    game.set_current_city(city);
                     break;
                 }
             }
@@ -111,15 +110,15 @@ int main()
                 case UI_Map: {
                     game.draw_map();
                     game.draw_cities(&city_vec);
-                    game.draw_current_unit(current_unit, visible);
-                    game.draw_rest_units(&unit_vec, current_unit);
+                    game.draw_current_unit(game.current_unit(), visible);
+                    game.draw_rest_units(&unit_vec, game.current_unit());
                 }
                 break;
 
                 case UI_City: {
-                    DrawText(TextFormat("%s", current_city->name().c_str()), 10, 0, 24, WHITE);
+                    DrawText(TextFormat("%s", game.current_city()->name().c_str()), 10, 0, 24, WHITE);
                     int idx = 0;
-                    for (auto task: current_city->tasks) {
+                    for (auto task: game.current_city()->tasks) {
                         DrawText(TextFormat("%s", CityTask_to_Str(task).c_str()), 10, 24 + 24 * (idx++), 24, BLUE);
                     }
                 }
@@ -131,6 +130,7 @@ int main()
         EndDrawing();
     }
 
+    game.Unload();
     CloseWindow();
 
     return 0;

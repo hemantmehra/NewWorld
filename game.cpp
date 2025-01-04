@@ -23,21 +23,22 @@ Game::Game(int rows, int cols, int map_title_size)
     }
 }
 
-Game::~Game()
+void Game::Unload()
 {
     for (auto& it : m_texture_map) {
         UnloadTexture(it.second);
     }
 }
 
-// Texture2D Game::get_texture(std::string k)
-// {
-//     m_texture_map.find(k);
-// }
-
 int Game::turn() { return m_turn; }
 
-void Game::next_turn() { m_turn++; }
+void Game::next_turn(std::vector<City*> *city_vec)
+{
+    m_turn++;
+    for (auto city : *city_vec) {
+        city->inc_population();
+    }
+}
 
 std::string Game::get_next_city_name()
 {
@@ -114,4 +115,24 @@ void Game::draw_rest_units(std::vector<Unit*> *unit_vec, Unit* current_unit)
             draw_unit(unit);
         }
     }
+}
+
+Unit *Game::current_unit()
+{
+    return m_current_unit;
+}
+
+City *Game::current_city()
+{
+    return m_current_city;
+}
+
+void Game::set_current_unit(Unit *unit)
+{
+    m_current_unit = unit;
+}
+
+void Game::set_current_city(City *city)
+{
+    m_current_city = city;
 }

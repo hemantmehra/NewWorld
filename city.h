@@ -20,6 +20,7 @@ class City
 public:
     City(std::string name, int x, int y);
     int population();
+    void update_food_storage();
     void inc_population();
     void dec_population();
     std::string name();
@@ -32,4 +33,6 @@ private:
     int m_population;
     CityTask m_task;
     std::string m_name;
+    int m_food;
+    int m_food_storage;
 };

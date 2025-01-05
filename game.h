@@ -7,6 +7,12 @@
 #include "city.h"
 #include "unit.h"
 
+enum TileKind {
+    T_SEA,
+    T_GRASS,
+    T_RIVER
+};
+
 class Game {
 public:
     Game(int rows, int cols, int map_title_size);

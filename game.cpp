@@ -9,6 +9,7 @@ Game::Game(int rows, int cols, int map_title_size)
     m_texture_map["city"] = LoadTexture("assets/City.png");
     m_texture_map["settler"] = LoadTexture("assets/Settler.png");
     m_texture_map["warrior"] = LoadTexture("assets/Warrior.png");
+    m_texture_map["river"] = LoadTexture("assets/River.png");
 
     m_city_names.push_back("ABC");
     m_city_names.push_back("DEF");
@@ -18,8 +19,16 @@ Game::Game(int rows, int cols, int map_title_size)
 
     for (int i=0; i<rows; i++) {
         for (int j=0; j<cols; j++) {
-            m_map[i][j] = 1;
+            m_map[i][j] = T_GRASS;
         }
+    }
+
+    int x = GetRandomValue(rows/5, 4 * rows/5);
+    int y1 = GetRandomValue(cols/5, cols/3);
+    int y2 = GetRandomValue(2*cols/3, 4*cols/5);
+
+    for (int i=y1; i<y2; i++) {
+        m_map[x][i] = T_RIVER;
     }
 }
 
@@ -36,7 +45,7 @@ void Game::next_turn(std::vector<City*> *city_vec)
 {
     m_turn++;
     for (auto city : *city_vec) {
-        city->inc_population();
+        city->update_food_storage();
     }
 }
 
@@ -54,12 +63,17 @@ void Game::draw_map()
 {
     for (int i=0; i<m_rows; i++) {
         for (int j=0; j<m_cols; j++) {
-            if (m_map[i][j] == 1) {
-                DrawTexture(m_texture_map["grass"], j*m_map_title_size, i*m_map_title_size, WHITE);
+            Texture2D t;
+            if (m_map[i][j] == T_GRASS) {
+                t = m_texture_map["grass"];
             }
-            else if (m_map[i][j] == 0) {
-                DrawTexture(m_texture_map["water"], j*m_map_title_size, i*m_map_title_size, WHITE);
+            else if (m_map[i][j] == T_RIVER) {
+                t = m_texture_map["river"];
             }
+            else {
+                t = m_texture_map["water"];
+            }
+            DrawTexture(t, j*m_map_title_size, i*m_map_title_size, WHITE);
         }
     }
 }

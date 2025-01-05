@@ -10,6 +10,7 @@ Game::Game(int rows, int cols, int map_title_size)
     m_texture_map["settler"] = LoadTexture("assets/Settler.png");
     m_texture_map["warrior"] = LoadTexture("assets/Warrior.png");
     m_texture_map["river"] = LoadTexture("assets/River.png");
+    m_texture_map["hill"] = LoadTexture("assets/Hill.png");
 
     m_city_names.push_back("ABC");
     m_city_names.push_back("DEF");
@@ -19,9 +20,17 @@ Game::Game(int rows, int cols, int map_title_size)
 
     for (int i=0; i<rows; i++) {
         for (int j=0; j<cols; j++) {
-            m_map[i][j] = T_GRASS;
+            if (i == 0 || j == 0 || i == rows-1 || j == cols-1)
+                m_map[i][j] = T_SEA;
+            else
+                m_map[i][j] = T_GRASS;
         }
     }
+
+    m_map[1][1] = T_HILL;
+    m_map[1][2] = T_HILL;
+    m_map[2][1] = T_HILL;
+    m_map[2][2] = T_HILL;
 
     int x = GetRandomValue(rows/5, 4 * rows/5);
     int y1 = GetRandomValue(cols/5, cols/3);
@@ -64,14 +73,19 @@ void Game::draw_map()
     for (int i=0; i<m_rows; i++) {
         for (int j=0; j<m_cols; j++) {
             Texture2D t;
-            if (m_map[i][j] == T_GRASS) {
-                t = m_texture_map["grass"];
-            }
-            else if (m_map[i][j] == T_RIVER) {
-                t = m_texture_map["river"];
-            }
-            else {
-                t = m_texture_map["water"];
+            switch(m_map[i][j]) {
+                case T_GRASS:
+                    t = m_texture_map["grass"];
+                    break;
+                case T_RIVER:
+                    t = m_texture_map["river"];
+                    break;
+                case T_HILL:
+                    t = m_texture_map["hill"];
+                    break;
+                default:
+                    t = m_texture_map["water"];
+
             }
             DrawTexture(t, j*m_map_title_size, i*m_map_title_size, WHITE);
         }

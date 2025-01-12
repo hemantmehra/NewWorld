@@ -3,16 +3,11 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <iostream>
 #include <raylib.h>
 #include "city.h"
 #include "unit.h"
-
-enum TileKind {
-    T_SEA,
-    T_GRASS,
-    T_RIVER,
-    T_HILL
-};
+#include "tile.h"
 
 class Game {
 public:

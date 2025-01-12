@@ -18,26 +18,44 @@ Game::Game(int rows, int cols, int map_title_size)
 
     m_next_city_name_idx = 0;
 
+    std::vector<std::string> charmap;
+    charmap.push_back("WWWWWWWWWWWWWWWWWWWWW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGHHHHHGGGGGGGGGGGW");
+    charmap.push_back("WGGGHHHHHGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGHHGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGRRRRRRRRGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WWWWWWWWWWWWWWWWWWWWW");
+
     for (int i=0; i<rows; i++) {
         for (int j=0; j<cols; j++) {
-            if (i == 0 || j == 0 || i == rows-1 || j == cols-1)
-                m_map[i][j] = T_SEA;
-            else
-                m_map[i][j] = T_GRASS;
+            char ch = 'W';
+            if (i<charmap.size() && j<charmap.at(0).size())
+                ch = charmap.at(i).at(j);
+            
+            switch(ch) {
+                case 'W':
+                    m_map[i][j] = T_SEA;
+                    break;
+                case 'G':
+                    m_map[i][j] = T_GRASS;
+                    break;
+                case 'H':
+                    m_map[i][j] = T_HILL;
+                    break;
+                case 'R':
+                    m_map[i][j] = T_RIVER;
+                    break;
+                default:
+                    break;
+            }
         }
-    }
-
-    m_map[1][1] = T_HILL;
-    m_map[1][2] = T_HILL;
-    m_map[2][1] = T_HILL;
-    m_map[2][2] = T_HILL;
-
-    int x = GetRandomValue(rows/5, 4 * rows/5);
-    int y1 = GetRandomValue(cols/5, cols/3);
-    int y2 = GetRandomValue(2*cols/3, 4*cols/5);
-
-    for (int i=y1; i<y2; i++) {
-        m_map[x][i] = T_RIVER;
     }
 }
 
@@ -53,8 +71,9 @@ int Game::turn() { return m_turn; }
 void Game::next_turn(std::vector<City*> *city_vec)
 {
     m_turn++;
+    // std::cout << "Number of Cities: " << city_vec->size() << '\n';
     for (auto city : *city_vec) {
-        city->update_food_storage();
+        city->next_turn(m_map);
     }
 }
 

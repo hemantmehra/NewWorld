@@ -5,28 +5,28 @@
 #include <string>
 #include <iostream>
 #include <raylib.h>
-#include "city.h"
+#include "settlement.h"
 #include "unit.h"
 #include "tile.h"
 
 class Game {
 public:
-    Game(int rows, int cols, int map_title_size);
+    Game(int rows, int cols, int map_title_size, std::vector<Settlement*> *settlement_vec);
     // ~Game();
     void Unload();
     Texture2D get_texture(std::string k);
     int turn();
-    void next_turn(std::vector<City*> *city_vec);
+    void next_turn(std::vector<Settlement*> *city_vec);
     std::string get_next_city_name();
     void draw_map();
-    void draw_cities(std::vector<City*> *city_vec);
+    void draw_settlement(std::vector<Settlement*> *city_vec);
     void draw_unit(Unit* unit);
     void draw_current_unit(Unit* current_unit, bool visible);
     void draw_rest_units(std::vector<Unit*> *unit_vec, Unit* current_unit);
     Unit *current_unit();
-    City *current_city();
+    Settlement *current_city();
     void set_current_unit(Unit *unit);
-    void set_current_city(City *city);
+    void set_current_city(Settlement *city);
 
 private:
     int m_turn;
@@ -37,6 +37,6 @@ private:
     int m_cols;
     int m_map_title_size;
     int m_map[50][50];
-    City *m_current_city;
+    Settlement *m_current_city;
     Unit *m_current_unit;
 };

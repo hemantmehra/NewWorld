@@ -1,14 +1,14 @@
-#include "city.h"
+#include "settlement.h"
 
-City::City(std::string name, int x, int y)
-    : m_x(x), m_y(y), m_population(1), m_name(name), m_food(0), m_gold(0), m_production(0)
+Settlement::Settlement(SettlementKind kind, std::string name, int x, int y)
+    : m_kind(kind), m_x(x), m_y(y), m_population(1), m_name(name), m_food(0), m_gold(0), m_production(0)
 {
     tasks.push_back((CityTask) {CT_GRANARY, 3});
 }
 
-int City::population() { return m_population; }
+int Settlement::population() { return m_population; }
 
-// void City::update_food_storage()
+// void Settlement::update_food_storage()
 // {
 //     m_food_storage += m_food * m_population - m_population * 2;
 
@@ -17,7 +17,7 @@ int City::population() { return m_population; }
 //     }
 // }
 
-void City::next_turn(int m_map[50][50])
+void Settlement::next_turn(int m_map[50][50])
 {
     for (int i=-1; i<=1; i++) {
         for (int j=-1; j<=1; j++) {
@@ -49,12 +49,12 @@ void City::next_turn(int m_map[50][50])
     // std::cout << "Production: " << m_production << '\n';
 }
 
-void City::inc_population()
+void Settlement::inc_population()
 {
     m_population++;
 }
 
-void City::dec_population()
+void Settlement::dec_population()
 {
     m_population--;
 }
@@ -72,7 +72,12 @@ std::string CityTask_to_Str(CityTask task)
     }
 }
 
-std::string City::name()
+std::string Settlement::name()
 {
     return m_name;
+}
+
+SettlementKind Settlement::kind()
+{
+    return m_kind;
 }

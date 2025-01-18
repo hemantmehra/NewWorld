@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <iostream>
 #include <raylib.h>
-#include "city.h"
+#include "settlement.h"
 #include "unit.h"
 #include "game.h"
 
@@ -33,19 +33,15 @@ int main()
     const int rows = SCREEN_HEIGHT / map_title_size + 1;
     const int cols = SCREEN_WIDTH / map_title_size - 10;
 
-    Game game(rows, cols, map_title_size);
-
     std::vector<Unit*> unit_vec;
-    std::vector<City*> city_vec;
+    std::vector<Settlement*> settlement_vec;
+    Game game(rows, cols, map_title_size, &settlement_vec);
 
     UI_Type current_ui = UI_Map;
 
     Unit *settler_unit = new Unit(U_Settler, 10, 10);
-    Unit *settler_unit1 = new Unit(U_Warrior, 10, 10);
 
     unit_vec.push_back(settler_unit);
-    unit_vec.push_back(settler_unit1);
-
     game.set_current_unit(unit_vec.at(0));
 
     int frame_counter = 0;
@@ -68,10 +64,13 @@ int main()
         if (IsKeyReleased(KEY_B)) {
             if (game.current_unit() && game.current_unit()->is_settler()) {
                 std::string city_name = game.get_next_city_name();
-                city_vec.push_back(new City(city_name, game.current_unit()->m_x, game.current_unit()->m_y));
+                settlement_vec.push_back(new Settlement(S_City, city_name, game.current_unit()->m_x, game.current_unit()->m_y));
                 std::cout << "[city] " << city_name << " " << game.current_unit()->m_x << ", " << game.current_unit()->m_y << std::endl;
+                Unit *warrior = new Unit(U_Warrior, game.current_unit()->m_x, game.current_unit()->m_y);
+                unit_vec.push_back(warrior);
                 game.current_unit()->consume();
                 game.set_current_unit(get_next_unit(&unit_vec, game.current_unit()));
+
             }
         }
 
@@ -80,7 +79,7 @@ int main()
         }
 
         if (IsKeyReleased(KEY_ENTER)) {
-            game.next_turn(&city_vec);
+            game.next_turn(&settlement_vec);
         }
 
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
@@ -88,7 +87,7 @@ int main()
             int my = GetMouseX() / map_title_size;
 
             std::cout << "[select] " << mx << ", " << my << std::endl;
-            for (auto city : city_vec) {
+            for (auto city : settlement_vec) {
                 if (city->m_x == mx && city->m_y == my) {
                     current_ui = UI_City;
                     game.set_current_city(city);
@@ -109,7 +108,7 @@ int main()
             switch(current_ui) {
                 case UI_Map: {
                     game.draw_map();
-                    game.draw_cities(&city_vec);
+                    game.draw_settlement(&settlement_vec);
                     game.draw_current_unit(game.current_unit(), visible);
                     game.draw_rest_units(&unit_vec, game.current_unit());
                 }

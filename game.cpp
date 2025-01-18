@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "game.h"
 
-Game::Game(int rows, int cols, int map_title_size)
+Game::Game(int rows, int cols, int map_title_size, std::vector<Settlement*> *settlement_vec)
     : m_turn(0), m_rows(rows), m_cols(cols), m_map_title_size(map_title_size)
 {
     m_texture_map["grass"] = LoadTexture("assets/Grass.png");
@@ -11,6 +11,7 @@ Game::Game(int rows, int cols, int map_title_size)
     m_texture_map["warrior"] = LoadTexture("assets/Warrior.png");
     m_texture_map["river"] = LoadTexture("assets/River.png");
     m_texture_map["hill"] = LoadTexture("assets/Hill.png");
+    m_texture_map["village"] = LoadTexture("assets/Village.png");
 
     m_city_names.push_back("ABC");
     m_city_names.push_back("DEF");
@@ -21,12 +22,16 @@ Game::Game(int rows, int cols, int map_title_size)
     std::vector<std::string> charmap;
     charmap.push_back("WWWWWWWWWWWWWWWWWWWWW");
     charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
-    charmap.push_back("WGGGHHHHHGGGGGGGGGGGW");
-    charmap.push_back("WGGGHHHHHGGGGGGGGGGGW");
-    charmap.push_back("WGGGGGHHGGGGGGGGGGGGW");
     charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
     charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
-    charmap.push_back("WGGGGRRRRRRRRGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
+    charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
     charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
     charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
     charmap.push_back("WGGGGGGGGGGGGGGGGGGGW");
@@ -57,6 +62,10 @@ Game::Game(int rows, int cols, int map_title_size)
             }
         }
     }
+
+    settlement_vec->push_back(new Settlement(S_Village, "Village", 5, 5));
+    settlement_vec->push_back(new Settlement(S_Village, "Village", 10, 5));
+    settlement_vec->push_back(new Settlement(S_Village, "Village", 5, 10));
 }
 
 void Game::Unload()
@@ -68,7 +77,7 @@ void Game::Unload()
 
 int Game::turn() { return m_turn; }
 
-void Game::next_turn(std::vector<City*> *city_vec)
+void Game::next_turn(std::vector<Settlement*> *city_vec)
 {
     m_turn++;
     // std::cout << "Number of Cities: " << city_vec->size() << '\n';
@@ -111,10 +120,19 @@ void Game::draw_map()
     }
 }
 
-void Game::draw_cities(std::vector<City*> *city_vec)
+void Game::draw_settlement(std::vector<Settlement*> *city_vec)
 {
     for (auto city : *city_vec) {
-        DrawTexture(m_texture_map["city"], city->m_y*m_map_title_size, city->m_x*m_map_title_size, WHITE);
+        switch(city->kind()) {
+            case S_Village:
+                DrawTexture(m_texture_map["village"], city->m_y*m_map_title_size, city->m_x*m_map_title_size, WHITE);
+                break;
+            case S_City:
+                DrawTexture(m_texture_map["city"], city->m_y*m_map_title_size, city->m_x*m_map_title_size, WHITE);
+                break;
+            default:
+                assert(0);
+        }
         DrawText(
             TextFormat("%d", city->population()),
             city->m_y*m_map_title_size + m_map_title_size/3,
@@ -169,7 +187,7 @@ Unit *Game::current_unit()
     return m_current_unit;
 }
 
-City *Game::current_city()
+Settlement *Game::current_city()
 {
     return m_current_city;
 }
@@ -179,7 +197,7 @@ void Game::set_current_unit(Unit *unit)
     m_current_unit = unit;
 }
 
-void Game::set_current_city(City *city)
+void Game::set_current_city(Settlement *city)
 {
     m_current_city = city;
 }
